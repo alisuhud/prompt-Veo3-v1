@@ -1,0 +1,111 @@
+// File: src/App.jsx
+import { useState } from "react";
+
+const angles = ["Eye level", "High angle", "Low angle", "Bird’s eye view", "Worm’s eye view", "Over the shoulder", "POV"];
+const lightings = ["Natural", "Soft warm", "Low-key", "High-key", "Backlight", "Hard shadows"];
+const moods = ["Romantic", "Dramatic", "Peaceful", "Epic", "Mysterious", "Playful"];
+const colorStyles = ["Teal & Orange", "Warm tones", "Cool tones", "Black & White", "Sepia"];
+const cameraMovements = ["Static", "Dolly", "Pan", "Tilt", "Zoom", "Handheld", "Drone"];
+const aspectRatios = ["16:9", "9:16", "4:3", "21:9"];
+const soundtracks = ["Cinematic orchestra", "Ambient", "Suspenseful", "Upbeat pop", "No music"];
+const voiceOvers = ["None", "Narration", "Dialogue", "Monologue"];
+const sfx = ["Rain", "Footsteps", "Gunshots", "Wind", "No SFX"];
+const physicsRealism = ["Realistic", "Stylized", "Surreal"];
+const sceneConsistency = ["Consistent", "Varied", "Unimportant"];
+const promptAccuracy = ["High", "Moderate", "Loose"];
+
+export default function App() {
+  const [prompt, setPrompt] = useState("");
+  const [translated, setTranslated] = useState("");
+  const [negativePrompt, setNegativePrompt] = useState("");
+  const [form, setForm] = useState({
+    subject: "",
+    location: "",
+    angle: angles[0],
+    lighting: lightings[0],
+    mood: moods[0],
+    color: colorStyles[0],
+    movement: cameraMovements[0],
+    ratio: aspectRatios[0],
+    soundtrack: soundtracks[0],
+    voiceOver: voiceOvers[0],
+    sfx: sfx[0],
+    realism: physicsRealism[0],
+    consistency: sceneConsistency[0],
+    accuracy: promptAccuracy[0],
+    negative: "",
+    extra: ""
+  });
+
+  const generatePrompt = () => {
+    const desc = `A ${form.angle.toLowerCase()} shot of ${form.subject} at ${form.location.toLowerCase()}, with ${form.lighting.toLowerCase()} lighting, ${form.color.toLowerCase()} color grading, and ${form.movement.toLowerCase()} camera movement. The scene has a ${form.mood.toLowerCase()} mood, framed in ${form.ratio} aspect ratio. Soundtrack is ${form.soundtrack.toLowerCase()}, with ${form.voiceOver.toLowerCase()} and ${form.sfx.toLowerCase()} sound effects. Physics realism is ${form.realism.toLowerCase()}, scene consistency is ${form.consistency.toLowerCase()}, and prompt accuracy is ${form.accuracy.toLowerCase()}. ${form.extra}`;
+    const translatedPrompt = `Pengambilan gambar ${form.angle.toLowerCase()} dari ${form.subject} di ${form.location.toLowerCase()}, dengan pencahayaan ${form.lighting.toLowerCase()}, gradasi warna ${form.color.toLowerCase()}, dan gerakan kamera ${form.movement.toLowerCase()}. Suasana ${form.mood.toLowerCase()}, rasio aspek ${form.ratio}. Musik latar: ${form.soundtrack.toLowerCase()}, voice-over: ${form.voiceOver.toLowerCase()}, efek suara: ${form.sfx.toLowerCase()}. Realisme fisik: ${form.realism.toLowerCase()}, konsistensi adegan: ${form.consistency.toLowerCase()}, akurasi prompt: ${form.accuracy.toLowerCase()}. ${form.extra}`;
+
+    setPrompt(desc);
+    setTranslated(translatedPrompt);
+    setNegativePrompt(form.negative);
+  };
+
+  const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-6 text-gray-800">
+      <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-4">
+        <h1 className="text-2xl font-bold">🎬 VEO3 Prompt Generator</h1>
+
+        <input className="w-full p-2 border rounded" placeholder="Describe the subject (e.g. 'a 25-year-old woman in a red dress')" value={form.subject} onChange={e => update("subject", e.target.value)} />
+        <input className="w-full p-2 border rounded" placeholder="Location (e.g. 'neon-lit city street at night')" value={form.location} onChange={e => update("location", e.target.value)} />
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <Select label="Camera Angle" options={angles} value={form.angle} onChange={val => update("angle", val)} />
+          <Select label="Lighting" options={lightings} value={form.lighting} onChange={val => update("lighting", val)} />
+          <Select label="Mood" options={moods} value={form.mood} onChange={val => update("mood", val)} />
+          <Select label="Color Grading" options={colorStyles} value={form.color} onChange={val => update("color", val)} />
+          <Select label="Camera Movement" options={cameraMovements} value={form.movement} onChange={val => update("movement", val)} />
+          <Select label="Aspect Ratio" options={aspectRatios} value={form.ratio} onChange={val => update("ratio", val)} />
+          <Select label="Soundtrack / Music" options={soundtracks} value={form.soundtrack} onChange={val => update("soundtrack", val)} />
+          <Select label="Voice Over / Dialog" options={voiceOvers} value={form.voiceOver} onChange={val => update("voiceOver", val)} />
+          <Select label="Sound Effects (SFX)" options={sfx} value={form.sfx} onChange={val => update("sfx", val)} />
+          <Select label="Physics Realism" options={physicsRealism} value={form.realism} onChange={val => update("realism", val)} />
+          <Select label="Scene Consistency" options={sceneConsistency} value={form.consistency} onChange={val => update("consistency", val)} />
+          <Select label="Prompt Accuracy" options={promptAccuracy} value={form.accuracy} onChange={val => update("accuracy", val)} />
+        </div>
+
+        <textarea className="w-full p-2 border rounded" placeholder="Extra details (optional)" value={form.extra} onChange={e => update("extra", e.target.value)} />
+        <textarea className="w-full p-2 border rounded" placeholder="Negative prompt (what to avoid)" value={form.negative} onChange={e => update("negative", e.target.value)} />
+
+        <button onClick={generatePrompt} className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Generate Prompt</button>
+
+        {prompt && (
+          <div className="p-4 bg-gray-50 border rounded whitespace-pre-wrap">
+            <strong>Prompt Output (English):</strong>
+            <p className="mt-2">{prompt}</p>
+
+            <strong className="mt-4 block">Prompt (Bahasa Indonesia):</strong>
+            <p className="mt-2">{translated}</p>
+
+            {negativePrompt && (
+              <>
+                <strong className="mt-4 block">🛑 Negative Prompt:</strong>
+                <p className="mt-2 text-red-600">{negativePrompt}</p>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Select({ label, options, value, onChange }) {
+  return (
+    <label className="block">
+      <span className="text-sm font-semibold">{label}</span>
+      <select value={value} onChange={e => onChange(e.target.value)} className="w-full mt-1 p-2 border rounded">
+        {options.map(opt => (
+          <option key={opt}>{opt}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
